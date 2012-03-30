@@ -9,7 +9,7 @@
     };
 
     var createInstanceOrReuseExistingOne = function(registration, dependencies){
-        if (registration.singleton && registration.instance){
+        if (registration.singleton && registration.isInitialized){
             return registration.instance;
         }
 

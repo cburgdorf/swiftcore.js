@@ -8,7 +8,11 @@
     lightcore.instanceProvider = {};
 
     lightcore.instanceProvider.constructorBased = function(registration, dependencies){
-        return new registration.type(dependencies);
+
+        var instance = new registration.type(dependencies);
+        registration.isInitialized = true;
+
+        return instance;
     };
 
     lightcore.instanceProvider.initializeBased = function(registration, dependencies){
@@ -16,6 +20,8 @@
             registration.instance = new registration.type();
         }
         registration.instance.initialize(dependencies);
+        registration.isInitialized = true;
+
         return registration.instance;
     };
 
