@@ -1,6 +1,9 @@
 module("lightcore.instanceprovider.initializebased.tests", {
     setup:function () {
         lightcore.defaultInstanceProvider = lightcore.instanceProvider.initializeBased;
+    },
+    teardown:function(){
+        lightcore.defaultInstanceProvider = lightcore.instanceProvider.constructorBased;
     }
 });
 

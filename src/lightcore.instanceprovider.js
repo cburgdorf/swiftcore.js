@@ -1,7 +1,7 @@
 (function () {
 
     if (!window.lightcore){
-        throw "make sure lightcore.js was loaded before lightcore.instanceprovider.js"
+        throw "make sure lightcore.js was loaded before lightcore.instanceProvider.js"
     }
 
     var lightcore = window.lightcore;

@@ -3,8 +3,9 @@
     var lightcore = window.lightcore, store = {};
 
     lightcore.defaultInstanceProvider = lightcore.instanceProvider.constructorBased;
+    lightcore.defaultDependencyFormatter = lightcore.dependencyFormatters.asIs;
 
-    function Registration(){};
+    function Registration(){}
 
     Registration.prototype.register = function(name){
         this.name = name;
@@ -50,17 +51,22 @@
         for (var i in requiresArray){
             var registrationName = requiresArray[i];
             var registration = lightcore.getRegistration(registrationName);
+            var formattedDependencyName = lightcore.defaultDependencyFormatter(registrationName);
 
             if (!hasDependencies(registration)){
-                dependencies[registrationName] = createInstanceOrReuseExistingOne(registration);
+                dependencies[formattedDependencyName] = createInstanceOrReuseExistingOne(registration);
             }
             else{
                 var tempDependencies = resolveOptions(registration.type.requires);
-                dependencies[registrationName] = createInstanceOrReuseExistingOne(registration, tempDependencies)
+                dependencies[formattedDependencyName] = createInstanceOrReuseExistingOne(registration, tempDependencies)
             }
         }
         return dependencies;
     };
+
+    var trimAndLowerCase = function(str){
+        return str.trim().toLowerCase();
+    }
 
     lightcore.register = function(name, type, singleton){
         return lightcore.addRegistration({
@@ -76,12 +82,12 @@
         newRegistration.type = registration.type;
         newRegistration.singleton = !!registration.singleton;
 
-        store[newRegistration.name] = newRegistration;
+        store[trimAndLowerCase(newRegistration.name)] = newRegistration;
         return newRegistration
     };
 
     lightcore.getRegistration = function(name) {
-        return store[name];
+        return store[trimAndLowerCase(name)];
     };
 
     lightcore.resolve = function(name){

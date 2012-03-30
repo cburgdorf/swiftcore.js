@@ -23,6 +23,25 @@ test('can resolve types', function () {
     ok(instance.test === "foo");
 });
 
+test('resolves types insensitive to case or whitespace', function () {
+
+    function SomeType() {
+        this.test = "foo";
+    }
+
+    lightcore.register("SomeType", SomeType);
+    var instance = lightcore.resolve("sometype");
+
+    lightcore.register("Some Type", SomeType);
+    var instance2 = lightcore.resolve("sometype ");
+
+    ok(instance !== undefined);
+    ok(instance.test === "foo");
+
+    ok(instance2 !== undefined);
+    ok(instance2.test === "foo");
+});
+
 test('multiple resolves result in different instances', function () {
 
     function SomeType() {
