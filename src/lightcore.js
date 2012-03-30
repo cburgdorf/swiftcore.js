@@ -4,6 +4,29 @@
 
     lightcore.defaultInstanceProvider = lightcore.instanceProvider.constructorBased;
 
+    function Registration(){};
+
+    Registration.prototype.register = function(name){
+        this.name = name;
+        return this;
+    };
+
+    Registration.prototype.withType = function(type){
+        this.type = type;
+        return this;
+    };
+
+    Registration.prototype.withInstance = function(instance){
+        this.instance = instance;
+        return this;
+    };
+
+    Registration.prototype.asSingleton = function(){
+        this.singleton = true;
+        return this;
+    };
+
+
     var hasDependencies = function(registration) {
         return !(registration.type.requires === undefined || registration.type.requires.length === 0);
     };
@@ -40,7 +63,7 @@
     };
 
     lightcore.register = function(name, type, singleton){
-        lightcore.addRegistration({
+        return lightcore.addRegistration({
             type: type,
             singleton: !!singleton,
             name: name
@@ -48,10 +71,13 @@
     };
 
     lightcore.addRegistration = function(registration){
-        if (!registration.name){
-            throw "registration must provide a name and type properties";
-        }
-        store[registration.name] = registration;
+        var newRegistration = new Registration();
+        newRegistration.name = registration.name;
+        newRegistration.type = registration.type;
+        newRegistration.singleton = !!registration.singleton;
+
+        store[newRegistration.name] = newRegistration;
+        return newRegistration
     };
 
     lightcore.getRegistration = function(name) {

@@ -1,3 +1,5 @@
+module("lightcore.tests");
+
 test('can register types', function () {
 
     function SomeType() {
