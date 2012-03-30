@@ -19,6 +19,7 @@
 
     Registration.prototype.withInstance = function(instance){
         this.instance = instance;
+        this.isInitialized = instance !== undefined && instance !== null;
         return this;
     };
 
