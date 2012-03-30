@@ -28,6 +28,10 @@
         return this;
     };
 
+    Registration.prototype.withOptions = function(options){
+        this.options = options;
+        return this;
+    };
 
     var hasDependencies = function(registration) {
         return !(registration.type.dependencies === undefined || registration.type.dependencies.length === 0);
@@ -69,6 +73,19 @@
         return str.trim().toLowerCase();
     }
 
+    var deepExtend = function(destination, source) {
+        for (var property in source) {
+            if (typeof source[property] === "object" &&
+                source[property] !== null ) {
+                destination[property] = destination[property] || {};
+                arguments.callee(destination[property], source[property]);
+            } else {
+                destination[property] = source[property];
+            }
+        }
+        return destination;
+    };
+
     swiftcore.register = function(name, type, singleton){
         return swiftcore.addRegistration({
             type: type,
@@ -79,10 +96,11 @@
 
     swiftcore.addRegistration = function(registration){
         var newRegistration = new Registration();
+        //this breaks all our tests
+        //deepExtend(newRegistration, registration);
         newRegistration.name = registration.name;
         newRegistration.type = registration.type;
         newRegistration.singleton = !!registration.singleton;
-
         store[trimAndLowerCase(newRegistration.name)] = newRegistration;
         return newRegistration
     };
