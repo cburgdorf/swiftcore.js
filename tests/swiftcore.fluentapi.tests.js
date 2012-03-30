@@ -28,6 +28,8 @@ test('can register types', function () {
     ok(registration !== undefined);
     ok(registration.type === SomeType);
     ok(registration.instance === instance);
+    ok(registration.isInitialized);
+
 });
 
 test('can register types', function () {
