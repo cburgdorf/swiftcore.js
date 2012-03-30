@@ -1,13 +1,13 @@
 (function () {
 
-    if (!window.lightcore){
-        throw "make sure lightcore.js was loaded before lightcore.instanceProvider.js"
+    if (!window.swiftcore){
+        throw "make sure swiftcore.js was loaded before swiftcore.instanceProvider.js"
     }
 
-    var lightcore = window.lightcore;
-    lightcore.instanceProvider = {};
+    var swiftcore = window.swiftcore;
+    swiftcore.instanceProvider = {};
 
-    lightcore.instanceProvider.constructorBased = function(registration, dependencies){
+    swiftcore.instanceProvider.constructorBased = function(registration, dependencies){
 
         var instance = new registration.type(dependencies);
         registration.isInitialized = true;
@@ -15,7 +15,7 @@
         return instance;
     };
 
-    lightcore.instanceProvider.initializeBased = function(registration, dependencies){
+    swiftcore.instanceProvider.initializeBased = function(registration, dependencies){
         if (!registration.instance){
             registration.instance = new registration.type();
         }

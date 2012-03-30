@@ -1,12 +1,12 @@
-module("lightcore.tests");
+module("swiftcore.tests");
 
 test('can register types', function () {
 
     function SomeType() {
     }
 
-    lightcore.register("SomeType", SomeType);
-    var registration = lightcore.getRegistration("SomeType");
+    swiftcore.register("SomeType", SomeType);
+    var registration = swiftcore.getRegistration("SomeType");
     ok(registration !== undefined);
     ok(registration.type === SomeType);
 });
@@ -17,8 +17,8 @@ test('can resolve types', function () {
         this.test = "foo";
     }
 
-    lightcore.register("SomeType", SomeType);
-    var instance = lightcore.resolve("SomeType");
+    swiftcore.register("SomeType", SomeType);
+    var instance = swiftcore.resolve("SomeType");
     ok(instance !== undefined);
     ok(instance.test === "foo");
 });
@@ -29,11 +29,11 @@ test('resolves types insensitive to case or whitespace', function () {
         this.test = "foo";
     }
 
-    lightcore.register("SomeType", SomeType);
-    var instance = lightcore.resolve("sometype");
+    swiftcore.register("SomeType", SomeType);
+    var instance = swiftcore.resolve("sometype");
 
-    lightcore.register("Some Type", SomeType);
-    var instance2 = lightcore.resolve("sometype ");
+    swiftcore.register("Some Type", SomeType);
+    var instance2 = swiftcore.resolve("sometype ");
 
     ok(instance !== undefined);
     ok(instance.test === "foo");
@@ -48,9 +48,9 @@ test('multiple resolves result in different instances', function () {
         this.test = "foo";
     }
 
-    lightcore.register("SomeType", SomeType);
-    var instance1 = lightcore.resolve("SomeType");
-    var instance2 = lightcore.resolve("SomeType");
+    swiftcore.register("SomeType", SomeType);
+    var instance1 = swiftcore.resolve("SomeType");
+    var instance2 = swiftcore.resolve("SomeType");
 
     ok(instance1 !== undefined);
     ok(instance1.test === "foo");
@@ -65,9 +65,9 @@ test('multiple resolves result in same instances with singleton option', functio
         this.test = "foo";
     }
 
-    lightcore.register("SomeType", SomeType, true);
-    var instance1 = lightcore.resolve("SomeType");
-    var instance2 = lightcore.resolve("SomeType");
+    swiftcore.register("SomeType", SomeType, true);
+    var instance1 = swiftcore.resolve("SomeType");
+    var instance2 = swiftcore.resolve("SomeType");
 
     ok(instance1 !== undefined);
     ok(instance1.test === "foo");
@@ -94,9 +94,9 @@ test('can resolve types depending on other types', function () {
 
     SomeType.requires = ["TypeA"];
 
-    lightcore.register("TypeA", TypeA);
-    lightcore.register("SomeType", SomeType);
-    var instance = lightcore.resolve("SomeType");
+    swiftcore.register("TypeA", TypeA);
+    swiftcore.register("SomeType", SomeType);
+    var instance = swiftcore.resolve("SomeType");
     ok(instance !== undefined);
     ok(instance.test === "foo");
 });
@@ -132,11 +132,11 @@ test('can resolve types depending on other types (3 levels)', function () {
 
     TypeC.requires = ["TypeB"];
 
-    lightcore.register("TypeA", TypeA);
-    lightcore.register("TypeB", TypeB);
-    lightcore.register("TypeC", TypeC);
+    swiftcore.register("TypeA", TypeA);
+    swiftcore.register("TypeB", TypeB);
+    swiftcore.register("TypeC", TypeC);
 
-    var instance = lightcore.resolve("TypeC");
+    var instance = swiftcore.resolve("TypeC");
     ok(instance !== undefined);
     ok(instance.test === "foo");
 });
@@ -176,11 +176,11 @@ test('can resolve types depending on multiple other types', function () {
 
     TypeC.requires = ["TypeB", "TypeA"];
 
-    lightcore.register("TypeA", TypeA);
-    lightcore.register("TypeB", TypeB);
-    lightcore.register("TypeC", TypeC);
+    swiftcore.register("TypeA", TypeA);
+    swiftcore.register("TypeB", TypeB);
+    swiftcore.register("TypeC", TypeC);
 
-    var instance = lightcore.resolve("TypeC");
+    var instance = swiftcore.resolve("TypeC");
     ok(instance !== undefined);
     ok(instance.test === "foo");
 });
@@ -217,11 +217,11 @@ test('nested singletons are only created once', function () {
 
     TypeC.requires = ["TypeB", "TypeA"];
 
-    lightcore.register("TypeA", TypeA, true);
-    lightcore.register("TypeB", TypeB, true);
-    lightcore.register("TypeC", TypeC, true);
+    swiftcore.register("TypeA", TypeA, true);
+    swiftcore.register("TypeB", TypeB, true);
+    swiftcore.register("TypeC", TypeC, true);
 
-    var instance = lightcore.resolve("TypeC");
+    var instance = swiftcore.resolve("TypeC");
     ok(instance !== undefined);
     ok(instance.test === "foo");
     equal(3, creations);

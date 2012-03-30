@@ -1,9 +1,9 @@
-module("lightcore.dependencyFormatters.tests",{
+module("swiftcore.dependencyFormatters.tests",{
     setup: function(){
-        lightcore.defaultDependencyFormatter = lightcore.dependencyFormatters.camelCase;
+        swiftcore.defaultDependencyFormatter = swiftcore.dependencyFormatters.camelCase;
     },
     teardown:function(){
-        lightcore.defaultDependencyFormatter = lightcore.dependencyFormatters.asIs;
+        swiftcore.defaultDependencyFormatter = swiftcore.dependencyFormatters.asIs;
     }
 });
 
@@ -24,9 +24,9 @@ test('can resolve types depending on other types', function () {
     }
 
     SomeType.requires = ["TypeA"];
-    lightcore.register("TypeA", TypeA);
-    lightcore.register("SomeType", SomeType);
-    var instance = lightcore.resolve("SomeType");
+    swiftcore.register("TypeA", TypeA);
+    swiftcore.register("SomeType", SomeType);
+    var instance = swiftcore.resolve("SomeType");
     ok(instance !== undefined);
     ok(instance.test === "foo");
 });

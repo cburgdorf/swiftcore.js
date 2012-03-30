@@ -1,9 +1,9 @@
 (function () {
 
-    var lightcore = window.lightcore, store = {};
+    var swiftcore = window.swiftcore, store = {};
 
-    lightcore.defaultInstanceProvider = lightcore.instanceProvider.constructorBased;
-    lightcore.defaultDependencyFormatter = lightcore.dependencyFormatters.asIs;
+    swiftcore.defaultInstanceProvider = swiftcore.instanceProvider.constructorBased;
+    swiftcore.defaultDependencyFormatter = swiftcore.dependencyFormatters.asIs;
 
     function Registration(){}
 
@@ -37,7 +37,7 @@
             return registration.instance;
         }
 
-        var instance = lightcore.defaultInstanceProvider(registration, dependencies);
+        var instance = swiftcore.defaultInstanceProvider(registration, dependencies);
         if (registration.singleton){
             registration.instance = instance;
         }
@@ -50,8 +50,8 @@
 
         for (var i in requiresArray){
             var registrationName = requiresArray[i];
-            var registration = lightcore.getRegistration(registrationName);
-            var formattedDependencyName = lightcore.defaultDependencyFormatter(registrationName);
+            var registration = swiftcore.getRegistration(registrationName);
+            var formattedDependencyName = swiftcore.defaultDependencyFormatter(registrationName);
 
             if (!hasDependencies(registration)){
                 dependencies[formattedDependencyName] = createInstanceOrReuseExistingOne(registration);
@@ -68,15 +68,15 @@
         return str.trim().toLowerCase();
     }
 
-    lightcore.register = function(name, type, singleton){
-        return lightcore.addRegistration({
+    swiftcore.register = function(name, type, singleton){
+        return swiftcore.addRegistration({
             type: type,
             singleton: !!singleton,
             name: name
         });
     };
 
-    lightcore.addRegistration = function(registration){
+    swiftcore.addRegistration = function(registration){
         var newRegistration = new Registration();
         newRegistration.name = registration.name;
         newRegistration.type = registration.type;
@@ -86,12 +86,12 @@
         return newRegistration
     };
 
-    lightcore.getRegistration = function(name) {
+    swiftcore.getRegistration = function(name) {
         return store[trimAndLowerCase(name)];
     };
 
-    lightcore.resolve = function(name){
-        var registration = lightcore.getRegistration(name);
+    swiftcore.resolve = function(name){
+        var registration = swiftcore.getRegistration(name);
         if (registration === undefined) {
             throw "Failed to resolve: " + name + ". Registration unknown";
         }
