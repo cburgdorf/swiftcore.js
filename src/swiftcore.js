@@ -29,7 +29,7 @@
 
 
     var hasDependencies = function(registration) {
-        return !(registration.type.requires === undefined || registration.type.requires.length === 0);
+        return !(registration.type.dependencies === undefined || registration.type.dependencies.length === 0);
     };
 
     var createInstanceOrReuseExistingOne = function(registration, dependencies){
@@ -45,23 +45,23 @@
         return instance;
     };
 
-    var resolveOptions = function(requiresArray, dependencies){
-        dependencies = dependencies || {};
+    var resolveOptions = function(dependencies){
+        var options = {};
 
-        for (var i in requiresArray){
-            var registrationName = requiresArray[i];
+        for (var i in dependencies){
+            var registrationName = dependencies[i];
             var registration = swiftcore.getRegistration(registrationName);
             var formattedDependencyName = swiftcore.defaultDependencyFormatter(registrationName);
 
             if (!hasDependencies(registration)){
-                dependencies[formattedDependencyName] = createInstanceOrReuseExistingOne(registration);
+                options[formattedDependencyName] = createInstanceOrReuseExistingOne(registration);
             }
             else{
-                var tempDependencies = resolveOptions(registration.type.requires);
-                dependencies[formattedDependencyName] = createInstanceOrReuseExistingOne(registration, tempDependencies)
+                var tempOptions = resolveOptions(registration.type.dependencies);
+                options[formattedDependencyName] = createInstanceOrReuseExistingOne(registration, tempOptions)
             }
         }
-        return dependencies;
+        return options;
     };
 
     var trimAndLowerCase = function(str){
@@ -100,8 +100,8 @@
             throw "Failed to resolve: " + name + ". Registration has no constructor function";
         }
 
-        var requiresArray = registration.type.requires || [];
-        var dependencies = resolveOptions(requiresArray);
+        var dependencies = registration.type.dependencies || [];
+        var dependencies = resolveOptions(dependencies);
 
         return createInstanceOrReuseExistingOne(registration, dependencies);
     };

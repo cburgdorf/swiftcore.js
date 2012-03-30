@@ -83,9 +83,6 @@ test('multiple resolves result in one initialize call with singleton option', fu
     ok(instance1.initCount === 1)
 });
 
-
-
-
 test('can resolve types depending on other types', function () {
 
     function TypeA() {
@@ -107,7 +104,7 @@ test('can resolve types depending on other types', function () {
         };
     }
 
-    SomeType.requires = ["TypeA"];
+    SomeType.dependencies = ["TypeA"];
 
     swiftcore.addRegistration({
         name: "TypeA",
@@ -144,7 +141,7 @@ test('can resolve types depending on other types (3 levels)', function () {
         };
     }
 
-    TypeB.requires = ["TypeA"];
+    TypeB.dependencies = ["TypeA"];
 
     function TypeC() {
         var self = this;
@@ -161,7 +158,7 @@ test('can resolve types depending on other types (3 levels)', function () {
         };
     }
 
-    TypeC.requires = ["TypeB"];
+    TypeC.dependencies = ["TypeB"];
 
     swiftcore.addRegistration({
         name: "TypeA",
@@ -206,7 +203,7 @@ test('can resolve types depending on multiple other types', function () {
         };
     }
 
-    TypeB.requires = ["TypeA"];
+    TypeB.dependencies = ["TypeA"];
 
     function TypeC() {
         var self = this;
@@ -227,7 +224,7 @@ test('can resolve types depending on multiple other types', function () {
         };
     }
 
-    TypeC.requires = ["TypeB", "TypeA"];
+    TypeC.dependencies = ["TypeB", "TypeA"];
 
     swiftcore.addRegistration({
         name: "TypeA",
@@ -275,7 +272,7 @@ test('nested singletons are only created once', function () {
         };
     }
 
-    TypeB.requires = ["TypeA"];
+    TypeB.dependencies = ["TypeA"];
 
     function TypeC() {
         var self = this;
@@ -297,7 +294,7 @@ test('nested singletons are only created once', function () {
         };
     }
 
-    TypeC.requires = ["TypeB", "TypeA"];
+    TypeC.dependencies = ["TypeB", "TypeA"];
 
     swiftcore.addRegistration({
         name: "TypeA",

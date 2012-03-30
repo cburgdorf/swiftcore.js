@@ -85,14 +85,15 @@ test('can resolve types depending on other types', function () {
         if (options.TypeA === undefined) {
             throw "missing argument [typeA]"
         }
-        this.test = "foo";
 
         if (Object.keys(options).length !== 1){
             throw "unexpected arguments"
         }
+
+        this.test = "foo";
     }
 
-    SomeType.requires = ["TypeA"];
+    SomeType.dependencies = ["TypeA"];
 
     swiftcore.register("TypeA", TypeA);
     swiftcore.register("SomeType", SomeType);
@@ -116,7 +117,7 @@ test('can resolve types depending on other types (3 levels)', function () {
         }
     }
 
-    TypeB.requires = ["TypeA"];
+    TypeB.dependencies = ["TypeA"];
 
     function TypeC(options) {
         if (options.TypeB === undefined) {
@@ -130,7 +131,7 @@ test('can resolve types depending on other types (3 levels)', function () {
         this.test = "foo";
     }
 
-    TypeC.requires = ["TypeB"];
+    TypeC.dependencies = ["TypeB"];
 
     swiftcore.register("TypeA", TypeA);
     swiftcore.register("TypeB", TypeB);
@@ -156,7 +157,7 @@ test('can resolve types depending on multiple other types', function () {
         }
     }
 
-    TypeB.requires = ["TypeA"];
+    TypeB.dependencies = ["TypeA"];
 
     function TypeC(options) {
         if (options.TypeA === undefined) {
@@ -174,7 +175,7 @@ test('can resolve types depending on multiple other types', function () {
         this.test = "foo";
     }
 
-    TypeC.requires = ["TypeB", "TypeA"];
+    TypeC.dependencies = ["TypeB", "TypeA"];
 
     swiftcore.register("TypeA", TypeA);
     swiftcore.register("TypeB", TypeB);
@@ -200,7 +201,7 @@ test('nested singletons are only created once', function () {
         }
     }
 
-    TypeB.requires = ["TypeA"];
+    TypeB.dependencies = ["TypeA"];
 
     function TypeC(options) {
         creations++;
@@ -215,7 +216,7 @@ test('nested singletons are only created once', function () {
         this.test = "foo";
     }
 
-    TypeC.requires = ["TypeB", "TypeA"];
+    TypeC.dependencies = ["TypeB", "TypeA"];
 
     swiftcore.register("TypeA", TypeA, true);
     swiftcore.register("TypeB", TypeB, true);

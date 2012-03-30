@@ -23,7 +23,7 @@ test('can resolve types depending on other types', function () {
         }
     }
 
-    SomeType.requires = ["TypeA"];
+    SomeType.dependencies = ["TypeA"];
     swiftcore.register("TypeA", TypeA);
     swiftcore.register("SomeType", SomeType);
     var instance = swiftcore.resolve("SomeType");
