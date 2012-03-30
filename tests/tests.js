@@ -65,6 +65,10 @@ test('can resolve types depending on other types', function () {
             throw "missing argument [typeA]"
         }
         this.test = "foo";
+
+        if (Object.keys(options).length !== 1){
+            throw "unexpected arguments"
+        }
     }
 
     SomeType.requires = ["TypeA"];
@@ -85,13 +89,21 @@ test('can resolve types depending on other types (3 levels)', function () {
         if (options.TypeA === undefined) {
             throw "missing argument [typeA]"
         }
+
+        if (Object.keys(options).length !== 1){
+            throw "unexpected arguments"
+        }
     }
 
     TypeB.requires = ["TypeA"];
 
     function TypeC(options) {
-        if (options.TypeA === undefined) {
-            throw "missing argument [typeA]"
+        if (options.TypeB === undefined) {
+            throw "missing argument [typeB]"
+        }
+
+        if (Object.keys(options).length !== 1){
+            throw "unexpected arguments"
         }
 
         this.test = "foo";
@@ -117,6 +129,10 @@ test('can resolve types depending on multiple other types', function () {
         if (options.TypeA === undefined) {
             throw "missing argument [typeA]"
         }
+
+        if (Object.keys(options).length !== 1){
+            throw "unexpected arguments"
+        }
     }
 
     TypeB.requires = ["TypeA"];
@@ -128,6 +144,10 @@ test('can resolve types depending on multiple other types', function () {
 
         if (options.TypeB === undefined) {
             throw "missing argument [typeB]"
+        }
+
+        if (Object.keys(options).length !== 2){
+            throw "unexpected arguments"
         }
 
         this.test = "foo";

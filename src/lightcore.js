@@ -32,8 +32,8 @@
                 dependencies[registrationName] = createInstanceOrReuseExistingOne(registration);
             }
             else{
-                resolveOptions(registration.type.requires, dependencies);
-                dependencies[registrationName] = createInstanceOrReuseExistingOne(registration, dependencies)
+                var tempDependencies = resolveOptions(registration.type.requires);
+                dependencies[registrationName] = createInstanceOrReuseExistingOne(registration, tempDependencies)
             }
         }
         return dependencies;

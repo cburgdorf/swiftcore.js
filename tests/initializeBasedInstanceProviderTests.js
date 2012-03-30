@@ -13,7 +13,6 @@ test('can resolve types', function () {
         };
     }
 
-    lightcore.register("SomeType", SomeType);
     lightcore.addRegistration({
         name:"SomeType",
         type:SomeType,
@@ -35,7 +34,6 @@ test('multiple resolves result in multiple initialize calls', function () {
         };
     }
 
-    lightcore.register("SomeType", SomeType);
     lightcore.addRegistration({
         name: "SomeType",
         type: SomeType,
@@ -65,7 +63,6 @@ test('multiple resolves result in one initialize call with singleton option', fu
         };
     }
 
-    lightcore.register("SomeType", SomeType);
     lightcore.addRegistration({
         name: "SomeType",
         type: SomeType,
@@ -84,91 +81,168 @@ test('multiple resolves result in one initialize call with singleton option', fu
 });
 
 
-/*
+
 
 test('can resolve types depending on other types', function () {
 
     function TypeA() {
+        this.initialize = function(){};
     }
 
-    function SomeType(options) {
-        if (options.TypeA === undefined) {
-            throw "missing argument [typeA]"
-        }
-        this.test = "foo";
+    function SomeType() {
+        var self = this;
+        self.initialize = function(options){
+            if (options.TypeA === undefined){
+                throw "missing argument [TypeA]"
+            }
+            self.test = "foo";
+
+            if (Object.keys(options).length !== 1){
+                throw "unexpected arguments"
+            }
+
+        };
     }
 
     SomeType.requires = ["TypeA"];
 
-    lightcore.register("TypeA", TypeA);
-    lightcore.register("SomeType", SomeType);
+    lightcore.addRegistration({
+        name: "TypeA",
+        type: TypeA,
+        instance: new TypeA()
+    });
+
+    lightcore.addRegistration({
+        name: "SomeType",
+        type: SomeType,
+        instance: new SomeType()
+    });
+
     var instance = lightcore.resolve("SomeType");
     ok(instance !== undefined);
     ok(instance.test === "foo");
 });
 
 test('can resolve types depending on other types (3 levels)', function () {
-
     function TypeA() {
+        this.initialize = function(){};
     }
 
-    function TypeB(options) {
-        if (options.TypeA === undefined) {
-            throw "missing argument [typeA]"
-        }
+    function TypeB() {
+        var self = this;
+        self.initialize = function(options){
+            if (options.TypeA === undefined){
+                throw "missing argument [TypeA]"
+            }
+
+            if (Object.keys(options).length !== 1){
+                throw "unexpected arguments"
+            }
+        };
     }
 
     TypeB.requires = ["TypeA"];
 
-    function TypeC(options) {
-        if (options.TypeA === undefined) {
-            throw "missing argument [typeA]"
-        }
+    function TypeC() {
+        var self = this;
+        self.initialize = function(options){
+            if (options.TypeB === undefined){
+                throw "missing argument [TypeA]"
+            }
 
-        this.test = "foo";
+            if (Object.keys(options).length !== 1){
+                throw "unexpected arguments"
+            }
+
+            this.test = "foo";
+        };
     }
 
     TypeC.requires = ["TypeB"];
 
-    lightcore.register("TypeA", TypeA);
-    lightcore.register("TypeB", TypeB);
-    lightcore.register("TypeC", TypeC);
+    lightcore.addRegistration({
+        name: "TypeA",
+        type: TypeA,
+        instance: new TypeA()
+    });
+
+    lightcore.addRegistration({
+        name: "TypeB",
+        type: TypeB,
+        instance: new TypeB()
+    });
+
+    lightcore.addRegistration({
+        name: "TypeC",
+        type: TypeC,
+        instance: new TypeC()
+    });
 
     var instance = lightcore.resolve("TypeC");
     ok(instance !== undefined);
     ok(instance.test === "foo");
 });
 
+
 test('can resolve types depending on multiple other types', function () {
 
     function TypeA() {
+        this.initialize = function(){};
     }
 
-    function TypeB(options) {
-        if (options.TypeA === undefined) {
-            throw "missing argument [typeA]"
-        }
+    function TypeB() {
+        var self = this;
+        self.initialize = function(options){
+            if (options.TypeA === undefined){
+                throw "missing argument [TypeA]"
+            }
+
+            if (Object.keys(options).length !== 1){
+                throw "unexpected arguments"
+            }
+        };
     }
 
     TypeB.requires = ["TypeA"];
 
-    function TypeC(options) {
-        if (options.TypeA === undefined) {
-            throw "missing argument [typeA]"
-        }
+    function TypeC() {
+        var self = this;
+        self.initialize = function(options){
+            if (options.TypeB === undefined){
+                throw "missing argument [TypeB]"
+            }
 
-        if (options.TypeB === undefined) {
-            throw "missing argument [typeB]"
-        }
+            if (options.TypeA === undefined){
+                throw "missing argument [TypeA]"
+            }
 
-        this.test = "foo";
+            if (Object.keys(options).length !== 2){
+                throw "unexpected arguments"
+            }
+
+            this.test = "foo";
+        };
     }
 
     TypeC.requires = ["TypeB", "TypeA"];
 
-    lightcore.register("TypeA", TypeA);
-    lightcore.register("TypeB", TypeB);
-    lightcore.register("TypeC", TypeC);
+    lightcore.addRegistration({
+        name: "TypeA",
+        type: TypeA,
+        instance: new TypeA()
+    });
+
+    lightcore.addRegistration({
+        name: "TypeB",
+        type: TypeB,
+        instance: new TypeB()
+    });
+
+    lightcore.addRegistration({
+        name: "TypeC",
+        type: TypeC,
+        instance: new TypeC()
+    });
 
     var instance = lightcore.resolve("TypeC");
     ok(instance !== undefined);
@@ -176,43 +250,75 @@ test('can resolve types depending on multiple other types', function () {
 });
 
 test('nested singletons are only created once', function () {
-
     var creations = 0;
 
     function TypeA() {
-        creations++;
+        this.initialize = function(){
+            creations++;
+        };
     }
 
-    function TypeB(options) {
-        creations++;
-        if (options.TypeA === undefined) {
-            throw "missing argument [typeA]"
-        }
+    function TypeB() {
+        var self = this;
+        self.initialize = function(options){
+            if (options.TypeA === undefined){
+                throw "missing argument [TypeA]"
+            }
+
+            if (Object.keys(options).length !== 1){
+                throw "unexpected arguments"
+            }
+            creations++;
+        };
     }
 
     TypeB.requires = ["TypeA"];
 
-    function TypeC(options) {
-        creations++;
-        if (options.TypeA === undefined) {
-            throw "missing argument [typeA]"
-        }
+    function TypeC() {
+        var self = this;
+        self.initialize = function(options){
+            if (options.TypeB === undefined){
+                throw "missing argument [TypeB]"
+            }
 
-        if (options.TypeB === undefined) {
-            throw "missing argument [typeB]"
-        }
+            if (options.TypeA === undefined){
+                throw "missing argument [TypeA]"
+            }
 
-        this.test = "foo";
+            if (Object.keys(options).length !== 2){
+                throw "unexpected arguments"
+            }
+
+            this.test = "foo";
+            creations++;
+        };
     }
 
     TypeC.requires = ["TypeB", "TypeA"];
 
-    lightcore.register("TypeA", TypeA, true);
-    lightcore.register("TypeB", TypeB, true);
-    lightcore.register("TypeC", TypeC, true);
+    lightcore.addRegistration({
+        name: "TypeA",
+        type: TypeA,
+        instance: new TypeA(),
+        singleton: true
+    });
+
+    lightcore.addRegistration({
+        name: "TypeB",
+        type: TypeB,
+        instance: new TypeB(),
+        singleton: true
+    });
+
+    lightcore.addRegistration({
+        name: "TypeC",
+        type: TypeC,
+        instance: new TypeC(),
+        singleton: true
+    });
 
     var instance = lightcore.resolve("TypeC");
     ok(instance !== undefined);
     ok(instance.test === "foo");
     equal(3, creations);
-});*/
+});
