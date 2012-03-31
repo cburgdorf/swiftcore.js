@@ -219,6 +219,8 @@ https://github.com/cburgdorf/swiftcore.js/tree/master/tests
 
 The projects is MIT licensed and accepts pull requests
 
+It's very small. The minified source is less than 3.4 kb.
+
 
 
 
