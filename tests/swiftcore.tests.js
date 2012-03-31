@@ -23,6 +23,20 @@ test('can resolve types', function () {
     ok(instance.test === "foo");
 });
 
+test('keeps user defined registration properties', function () {
+
+    function SomeType() {
+        this.test = "foo";
+    }
+
+    swiftcore.addRegistration({name: "someType", type: SomeType, userDefinedProperty: true });
+    var registration = swiftcore.getRegistration("someType");
+
+    equal(registration.name, "someType");
+    equal(registration.type, SomeType)
+    equal(registration.userDefinedProperty, true);
+});
+
 test('resolves types insensitive to case or whitespace', function () {
 
     function SomeType() {
@@ -97,6 +111,36 @@ test('can resolve types depending on other types', function () {
 
     swiftcore.register("TypeA", TypeA);
     swiftcore.register("SomeType", SomeType);
+    var instance = swiftcore.resolve("SomeType");
+    ok(instance !== undefined);
+    ok(instance.test === "foo");
+});
+
+test('can resolve with additional options', function () {
+
+    function TypeA() {
+    }
+
+    function SomeType(options) {
+        if (options.TypeA === undefined) {
+            throw "missing argument [typeA]"
+        }
+
+        if (options.someOption === undefined){
+            throw "missing argument [someOption]";
+        }
+
+        if (Object.keys(options).length !== 2){
+            throw "unexpected arguments"
+        }
+
+        this.test = "foo";
+    }
+
+    SomeType.dependencies = ["TypeA"];
+
+    swiftcore.register("TypeA", TypeA);
+    swiftcore.register("SomeType", SomeType).withOptions({someOption: true});
     var instance = swiftcore.resolve("SomeType");
     ok(instance !== undefined);
     ok(instance.test === "foo");
