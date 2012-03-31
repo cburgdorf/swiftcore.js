@@ -92,17 +92,29 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         return this;
     };
 
+    Registration.prototype.withOptions = function(options){
+        this.options = options;
+        return this;
+    };
 
     var hasDependencies = function(registration) {
         return !(registration.type.dependencies === undefined || registration.type.dependencies.length === 0);
     };
 
-    var createInstanceOrReuseExistingOne = function(registration, dependencies){
+    var createInstanceOrReuseExistingOne = function(registration, options){
         if (registration.singleton && registration.isInitialized){
             return registration.instance;
         }
 
-        var instance = swiftcore.defaultInstanceProvider(registration, dependencies);
+        //Todo think about if that's really the right way to handle options. It could be problematic that the
+        //instance provider has no *convenient* way to see which parts of the object were dependencies
+        //and what were registered options.
+
+        //think about swiftcore.defaultInstanceProvider(registration, cleanOptions, extendedOptions);
+
+        deepExtend(options, registration.options);
+
+        var instance = swiftcore.defaultInstanceProvider(registration, options);
         if (registration.singleton){
             registration.instance = instance;
         }
@@ -131,7 +143,41 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     var trimAndLowerCase = function(str){
         return str.trim().toLowerCase();
-    }
+    };
+
+    //this code is stolen from here: http://noteslog.com/post/how-to-force-jqueryextend-deep-recursion/
+    var deepExtend = function() {
+        var target = arguments[0] || {}, i = 1, length = arguments.length, deep = false, options;
+
+        if (target.constructor == Boolean) {
+            deep = target;
+            target = arguments[1] || {};
+            i = 2;
+        }
+
+        if (typeof target != "object" && typeof target != "function")
+            target = {};
+
+        if (length == 1) {
+            target = this;
+            i = 0;
+        }
+
+        for (; i < length; i++)
+            if ((options = arguments[i]) != null)
+                for ( var name in options ) {
+                    if (target === options[name])
+                        continue;
+
+                    if (deep && options[name] && typeof options[name] == "object" && target[name] && !options[name].nodeType)
+                        target[name] = deepExtend(true, target[name], options[name]);
+
+                    else if (options[name] != undefined )
+                        target[name] = options[name];
+                }
+
+        return target;
+    };
 
     swiftcore.register = function(name, type, singleton){
         return swiftcore.addRegistration({
@@ -143,10 +189,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     swiftcore.addRegistration = function(registration){
         var newRegistration = new Registration();
-        newRegistration.name = registration.name;
-        newRegistration.type = registration.type;
-        newRegistration.singleton = !!registration.singleton;
-
+        deepExtend(newRegistration, registration);
         store[trimAndLowerCase(newRegistration.name)] = newRegistration;
         return newRegistration
     };
