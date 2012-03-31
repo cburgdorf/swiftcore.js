@@ -132,6 +132,95 @@ test('can resolve types depending on multiple other types', function () {
 });
 ```
 
+##So, how do I use singletons?
+
+```JavaScript
+test('nested singletons are only created once', function () {
+
+    var instancesOfTypeA = 0;
+
+    function TypeA() {
+        instancesOfTypeA++;
+    }
+
+    function TypeB(options) {
+        if (options.typeA === undefined) {
+            throw "missing argument [typeA]"
+        }
+    }
+
+    TypeB.dependencies = ["typeA"];
+
+    function TypeC(options) {
+        if (options.typeA === undefined) {
+            throw "missing argument [typeA]"
+        }
+
+        if (options.typeB === undefined) {
+            throw "missing argument [typeB]"
+        }
+
+        this.test = "foo";
+    }
+
+    TypeC.dependencies = ["typeB", "typeA"];
+
+    //The "asSingleton()" tells swiftcore to only create the instance once and reuse the same single instance
+    //each time one wants to resolve "typeA"
+    swiftcore.register("typeA").withType(TypeA).asSingleton();
+
+    //We could have also registered it in this fashion but the fluent way is more descriptive
+    //swiftcore.register("TypeA", TypeA, true);
+    swiftcore.register("typeB", TypeB);
+    swiftcore.register("typeC", TypeC);
+
+    var instance = swiftcore.resolve("TypeC");
+    ok(instance !== undefined);
+    ok(instance.test === "foo");
+    //This is the interesting part. In contrast to the previous example, the constructor function of TypeA was only called once
+    equal(1, instancesOfTypeA);
+});
+```
+
+##This all looks good but I dislike that you invoke functions with one single configuration object instead of single parameters
+
+Hey, that's cool with me! Swiftcore was designed with the [open closed principle](http://en.wikipedia.org/wiki/Open/closed_principle) in mind.
+You can trivially extend it to your needs!
+
+Let's take the example of above and say you would rather have your constructor function called with multiple parameters.
+Swiftcore comes with a concept of instance providers. This means swiftcore itself does not even know what it exactly means
+to "create an instance of something". What it does know is when to ask the current instance provider for a new instance.
+The default instance provider looks like this:
+
+```JavaScript
+swiftcore.instanceProvider.constructorBased = function(registration, dependencies){
+
+    //depenencies is the configuration object with all dependencies already resolved
+    var instance = new registration.type(dependencies);
+    //instance provider should set the isInitialized flat to true to tell swiftcore that the instance has been created
+    registration.isInitialized = true;
+
+    //return the created instance
+    return instance;
+};
+```
+
+I leave it as an exercise to you to come up with an instance provider that does invoke the constructor function with atomic parameters.
+All you then have to do is to tell swiftcore to use your custom instance provider:
+
+```JavaScript
+swiftcore.defaultInstanceProvider = myCustomInstanceProvider;
+```
+
+##What's left to say
+
+All current features are backed by tests and its a good starting point to look at the tests in order to get used to swiftcore's features:
+https://github.com/cburgdorf/swiftcore.js/tree/master/tests
+
+The projects is MIT licensed and accepts pull requests
+
+
+
 
 
 
