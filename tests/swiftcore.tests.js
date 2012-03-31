@@ -144,11 +144,14 @@ test('can resolve types depending on other types (3 levels)', function () {
 
 test('can resolve types depending on multiple other types', function () {
 
+    var instancesOfTypeA = 0;
+
     function TypeA() {
+        instancesOfTypeA++;
     }
 
     function TypeB(options) {
-        if (options.TypeA === undefined) {
+        if (options.typeA === undefined) {
             throw "missing argument [typeA]"
         }
 
@@ -157,14 +160,14 @@ test('can resolve types depending on multiple other types', function () {
         }
     }
 
-    TypeB.dependencies = ["TypeA"];
+    TypeB.dependencies = ["typeA"];
 
     function TypeC(options) {
-        if (options.TypeA === undefined) {
+        if (options.typeA === undefined) {
             throw "missing argument [typeA]"
         }
 
-        if (options.TypeB === undefined) {
+        if (options.typeB === undefined) {
             throw "missing argument [typeB]"
         }
 
@@ -175,15 +178,16 @@ test('can resolve types depending on multiple other types', function () {
         this.test = "foo";
     }
 
-    TypeC.dependencies = ["TypeB", "TypeA"];
+    TypeC.dependencies = ["typeB", "typeA"];
 
-    swiftcore.register("TypeA", TypeA);
-    swiftcore.register("TypeB", TypeB);
-    swiftcore.register("TypeC", TypeC);
+    swiftcore.register("typeA", TypeA);
+    swiftcore.register("typeB", TypeB);
+    swiftcore.register("typeC", TypeC);
 
-    var instance = swiftcore.resolve("TypeC");
+    var instance = swiftcore.resolve("typeC");
     ok(instance !== undefined);
     ok(instance.test === "foo");
+    equal(2, instancesOfTypeA);
 });
 
 test('nested singletons are only created once', function () {

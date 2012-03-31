@@ -54,7 +54,7 @@ test('can resolve types depending on other types (3 levels)', function () {
         this.test = "foo";
     }
 
-    //here we say TypeC depends on TypeB. So we made up a chain from TypeC to TypeB to TybeA
+    //here we say TypeC depends on TypeB. So we made up a chain from TypeC to TypeB to TypeA
     TypeC.dependencies = ["typeB"];
 
     //Now lets register our constructor functions together with a name to resolve them later
@@ -69,6 +69,66 @@ test('can resolve types depending on other types (3 levels)', function () {
     //at this point we know that everything went well and the dependencies have been injected. Otherwise we
     //wouldn't have reached this point
     ok(instance.test === "foo");
+});
+```
+
+##Can I have more than one dependency?
+
+Sure, man! That's the whole point. Look at this:
+
+```JavaScript
+test('can resolve types depending on multiple other types', function () {
+
+    var instancesOfTypeA = 0;
+
+    function TypeA() {
+        instancesOfTypeA++;
+    }
+
+    //TypeB depends on TypeA - same as before
+    function TypeB(options) {
+        if (options.typeA === undefined) {
+            throw "missing argument [typeA]"
+        }
+
+        if (Object.keys(options).length !== 1){
+            throw "unexpected arguments"
+        }
+    }
+
+    TypeB.dependencies = ["typeA"];
+
+    //TypeC depends on TypeA and TypeB
+    function TypeC(options) {
+        if (options.typeA === undefined) {
+            throw "missing argument [typeA]"
+        }
+
+        if (options.typeB === undefined) {
+            throw "missing argument [typeB]"
+        }
+
+        if (Object.keys(options).length !== 2){
+            throw "unexpected arguments"
+        }
+
+        this.test = "foo";
+    }
+
+    //All we have to do is to put another name into our array of dependencies
+    TypeC.dependencies = ["typeB", "typeA"];
+
+    swiftcore.register("typeA", TypeA);
+    swiftcore.register("typeB", TypeB);
+    swiftcore.register("typeC", TypeC);
+
+    var instance = swiftcore.resolve("typeC");
+    ok(instance !== undefined);
+    ok(instance.test === "foo");
+    //This is a key point! We also tracked how many instances of TypeA have been created. There are two
+    //because TypeB depends on TypeA and TypeC also depends on TypeA (together with TypeB)
+    //In the next example you will see that you can also register types as singletons.
+    equal(2, instancesOfTypeA);
 });
 ```
 
