@@ -182,7 +182,7 @@ test('nested singletons are only created once', function () {
 });
 ```
 
-##This all looks good but I dislike that you invoke functions with one single configuration object instead of single parameters
+##This all looks good but I dislike that you invoke functions with one single configuration object instead of multiple parameters
 
 Hey, that's cool with me! Swiftcore was designed with the [open closed principle](http://en.wikipedia.org/wiki/Open/closed_principle) in mind.
 You can trivially extend it to your needs!
