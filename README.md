@@ -12,7 +12,7 @@ on the topic I highly recommend to read this blog posting: http://coffeescripter
 
 Well tests say more a thousand words so look at this:
 
-```html
+```JavaScript
 test('can resolve types depending on other types (3 levels)', function () {
 
     function TypeA() {
