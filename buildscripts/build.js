@@ -15,6 +15,7 @@
 	}
 
 	concat([
+	    'LICENSE.txt',
 		'../src/swiftcore.core.js',
 		'../src/swiftcore.dependencyFormatters.js',
 		'../src/swiftcore.instanceProvider.js',
