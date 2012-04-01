@@ -1,7 +1,7 @@
 (function () {
 
     if (!window.swiftcore){
-        throw "make sure swiftcore.js was loaded before swiftcore.instanceProvider.js"
+        throw "make sure swiftcore.js was loaded before swiftcore.instanceProvider.js";
     }
 
     var swiftcore = window.swiftcore;
@@ -25,4 +25,4 @@
         return registration.instance;
     };
 
-})()
+})();

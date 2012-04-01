@@ -71,7 +71,7 @@
             }
             else{
                 var tempOptions = resolveOptions(registration.type.dependencies);
-                options[formattedDependencyName] = createInstanceOrReuseExistingOne(registration, tempOptions)
+                options[formattedDependencyName] = createInstanceOrReuseExistingOne(registration, tempOptions);
             }
         }
         return options;
@@ -127,7 +127,7 @@
         var newRegistration = new Registration();
         deepExtend(newRegistration, registration);
         store[trimAndLowerCase(newRegistration.name)] = newRegistration;
-        return newRegistration
+        return newRegistration;
     };
 
     swiftcore.getRegistration = function(name) {
@@ -145,8 +145,8 @@
         }
 
         var dependencies = registration.type.dependencies || [];
-        var dependencies = resolveOptions(dependencies);
+        dependencies = resolveOptions(dependencies);
 
         return createInstanceOrReuseExistingOne(registration, dependencies);
     };
-})()
+})();

@@ -1,7 +1,7 @@
 (function () {
 
     if (!window.swiftcore){
-        throw "make sure swiftcore.js was loaded before swiftcore.dependencyFormatters.js"
+        throw "make sure swiftcore.js was loaded before swiftcore.dependencyFormatters.js";
     }
 
     var swiftcore = window.swiftcore;
@@ -17,4 +17,4 @@
         }).replace(/\s+/g, '');
     };
 
-})()
+})();
