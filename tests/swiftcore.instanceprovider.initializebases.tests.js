@@ -26,6 +26,39 @@ test('can resolve types', function () {
     ok(instance.test === "foo");
 });
 
+test('can resolve instance provider on a per registration basis', function () {
+
+    function TypeA(){
+        var self = this;
+        self.initialize = function(){
+            self.test = "foo";
+        };
+    }
+
+    function SomeType(options) {
+        var self = this;
+        if (options.typeA === undefined){
+            throw "missing argument [typeA]";
+        }
+
+        self.boo = options.typeA.test;
+    }
+    SomeType.dependencies = ["typeA"]
+
+    swiftcore
+        .register("typeA")
+        .withType(TypeA);
+
+    swiftcore
+        .register("someType")
+        .withType(SomeType)
+        .withInstanceProvider(swiftcore.instanceProvider.constructorBased);
+
+    var instance = swiftcore.resolve("someType");
+    ok(instance !== undefined);
+    ok(instance.boo === "foo");
+});
+
 test('multiple resolves result in multiple initialize calls', function () {
 
     function SomeType() {

@@ -33,6 +33,10 @@
         return this;
     };
 
+    Registration.prototype.withInstanceProvider = function (instanceProvider){
+        this.instanceProvider = instanceProvider;
+    };
+
     var hasDependencies = function(registration) {
         return !(registration.type.dependencies === undefined || registration.type.dependencies.length === 0);
     };
@@ -50,7 +54,9 @@
 
         deepExtend(options, registration.options);
 
-        var instance = swiftcore.defaultInstanceProvider(registration, options);
+        var instanceProvider = registration.instanceProvider || swiftcore.defaultInstanceProvider;
+
+        var instance = instanceProvider(registration, options);
         if (registration.singleton){
             registration.instance = instance;
         }
