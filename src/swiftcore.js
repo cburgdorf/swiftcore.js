@@ -1,4 +1,4 @@
-(function () {
+(function (window) {
 
     var swiftcore = window.swiftcore, store = {};
 
@@ -174,4 +174,4 @@
 
         return createInstanceOrReuseExistingOne(registration, dependencies);
     };
-})();
+})(window);

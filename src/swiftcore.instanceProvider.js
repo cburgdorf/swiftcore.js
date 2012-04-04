@@ -1,4 +1,4 @@
-(function () {
+(function (window) {
 
     if (!window.swiftcore){
         throw "make sure swiftcore.js was loaded before swiftcore.instanceProvider.js";
@@ -25,4 +25,4 @@
         return registration.instance;
     };
 
-})();
+})(window);
