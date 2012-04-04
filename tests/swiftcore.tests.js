@@ -116,6 +116,32 @@ test('can resolve types depending on other types', function () {
     ok(instance.test === "foo");
 });
 
+test('can inject dependencies with with custom defined aliases', function () {
+
+    function TypeA() {
+    }
+
+    function SomeType(options) {
+        if (options.legacyTypeA === undefined) {
+            throw "missing argument [typeA]"
+        }
+
+        if (Object.keys(options).length !== 1){
+            throw "unexpected arguments"
+        }
+
+        this.test = "foo";
+    }
+
+    SomeType.dependencies = ["TypeA as legacyTypeA"];
+
+    swiftcore.register("TypeA", TypeA);
+    swiftcore.register("SomeType", SomeType);
+    var instance = swiftcore.resolve("SomeType");
+    ok(instance !== undefined);
+    ok(instance.test === "foo");
+});
+
 test('can resolve with additional options', function () {
 
     function TypeA() {

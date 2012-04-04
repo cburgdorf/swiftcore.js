@@ -64,13 +64,32 @@
         return instance;
     };
 
+    var getDependencyInfo = function(dependency){
+        var dependencyInfo;
+        if (dependency.indexOf(" as ") > -1){
+            var splitted = dependency.split(" as ");
+            dependencyInfo = {
+                name: splitted[0],
+                alias: splitted[1]
+            };
+        }
+        else{
+            dependencyInfo = {
+                name: dependency,
+                alias: null
+            }
+        }
+        return dependencyInfo;
+    }
+
     var resolveOptions = function(dependencies){
         var options = {};
 
         for (var i in dependencies){
-            var registrationName = dependencies[i];
-            var registration = swiftcore.getRegistration(registrationName);
-            var formattedDependencyName = swiftcore.defaultDependencyFormatter(registrationName);
+
+            var dependencyInfo = getDependencyInfo(dependencies[i]);
+            var registration = swiftcore.getRegistration(dependencyInfo.name);
+            var formattedDependencyName = dependencyInfo.alias !== null ? dependencyInfo.alias : swiftcore.defaultDependencyFormatter(dependencyInfo.name);
 
             if (!hasDependencies(registration)){
                 options[formattedDependencyName] = createInstanceOrReuseExistingOne(registration);
