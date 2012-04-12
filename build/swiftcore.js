@@ -11,13 +11,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 
-(function () {
+(function (window) {
     window.swiftcore = { };
-})()
-(function () {
+})(window);
+(function (window) {
 
     if (!window.swiftcore){
-        throw "make sure swiftcore.js was loaded before swiftcore.dependencyFormatters.js"
+        throw "make sure swiftcore.js was loaded before swiftcore.dependencyFormatters.js";
     }
 
     var swiftcore = window.swiftcore;
@@ -33,11 +33,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         }).replace(/\s+/g, '');
     };
 
-})()
-(function () {
+})(window);
+(function (window) {
 
     if (!window.swiftcore){
-        throw "make sure swiftcore.js was loaded before swiftcore.instanceProvider.js"
+        throw "make sure swiftcore.js was loaded before swiftcore.instanceProvider.js";
     }
 
     var swiftcore = window.swiftcore;
@@ -61,8 +61,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         return registration.instance;
     };
 
-})()
-(function () {
+})(window);
+(function (window) {
 
     var swiftcore = window.swiftcore, store = {};
 
@@ -97,6 +97,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         return this;
     };
 
+    Registration.prototype.withInstanceProvider = function (instanceProvider){
+        this.instanceProvider = instanceProvider;
+    };
+
     var hasDependencies = function(registration) {
         return !(registration.type.dependencies === undefined || registration.type.dependencies.length === 0);
     };
@@ -114,7 +118,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
         deepExtend(options, registration.options);
 
-        var instance = swiftcore.defaultInstanceProvider(registration, options);
+        var instanceProvider = registration.instanceProvider || swiftcore.defaultInstanceProvider;
+
+        var instance = instanceProvider(registration, options);
         if (registration.singleton){
             registration.instance = instance;
         }
@@ -122,20 +128,39 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         return instance;
     };
 
+    var getDependencyInfo = function(dependency){
+        var dependencyInfo;
+        if (dependency.indexOf(" as ") > -1){
+            var splitted = dependency.split(" as ");
+            dependencyInfo = {
+                name: splitted[0],
+                alias: splitted[1]
+            };
+        }
+        else{
+            dependencyInfo = {
+                name: dependency,
+                alias: null
+            }
+        }
+        return dependencyInfo;
+    }
+
     var resolveOptions = function(dependencies){
         var options = {};
 
         for (var i in dependencies){
-            var registrationName = dependencies[i];
-            var registration = swiftcore.getRegistration(registrationName);
-            var formattedDependencyName = swiftcore.defaultDependencyFormatter(registrationName);
+
+            var dependencyInfo = getDependencyInfo(dependencies[i]);
+            var registration = swiftcore.getRegistration(dependencyInfo.name);
+            var formattedDependencyName = dependencyInfo.alias !== null ? dependencyInfo.alias : swiftcore.defaultDependencyFormatter(dependencyInfo.name);
 
             if (!hasDependencies(registration)){
                 options[formattedDependencyName] = createInstanceOrReuseExistingOne(registration);
             }
             else{
                 var tempOptions = resolveOptions(registration.type.dependencies);
-                options[formattedDependencyName] = createInstanceOrReuseExistingOne(registration, tempOptions)
+                options[formattedDependencyName] = createInstanceOrReuseExistingOne(registration, tempOptions);
             }
         }
         return options;
@@ -191,7 +216,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         var newRegistration = new Registration();
         deepExtend(newRegistration, registration);
         store[trimAndLowerCase(newRegistration.name)] = newRegistration;
-        return newRegistration
+        return newRegistration;
     };
 
     swiftcore.getRegistration = function(name) {
@@ -209,8 +234,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         }
 
         var dependencies = registration.type.dependencies || [];
-        var dependencies = resolveOptions(dependencies);
+        dependencies = resolveOptions(dependencies);
 
         return createInstanceOrReuseExistingOne(registration, dependencies);
     };
-})()
+})(window);
