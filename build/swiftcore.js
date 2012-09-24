@@ -69,44 +69,44 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     swiftcore.defaultInstanceProvider = swiftcore.instanceProvider.constructorBased;
     swiftcore.defaultDependencyFormatter = swiftcore.dependencyFormatters.asIs;
 
-    function Registration(){}
+    function Registration() { }
 
-    Registration.prototype.register = function(name){
+    Registration.prototype.register = function (name) {
         this.name = name;
         return this;
     };
 
-    Registration.prototype.withType = function(type){
+    Registration.prototype.withType = function (type) {
         this.type = type;
         return this;
     };
 
-    Registration.prototype.withInstance = function(instance){
+    Registration.prototype.withInstance = function (instance) {
         this.instance = instance;
         this.isInitialized = instance !== undefined && instance !== null;
         return this;
     };
 
-    Registration.prototype.asSingleton = function(){
+    Registration.prototype.asSingleton = function () {
         this.singleton = true;
         return this;
     };
 
-    Registration.prototype.withOptions = function(options){
+    Registration.prototype.withOptions = function (options) {
         this.options = options;
         return this;
     };
 
-    Registration.prototype.withInstanceProvider = function (instanceProvider){
+    Registration.prototype.withInstanceProvider = function (instanceProvider) {
         this.instanceProvider = instanceProvider;
     };
 
-    var hasDependencies = function(registration) {
+    var hasDependencies = function (registration) {
         return !(registration.type.dependencies === undefined || registration.type.dependencies.length === 0);
     };
 
-    var createInstanceOrReuseExistingOne = function(registration, options){
-        if (registration.singleton && registration.isInitialized){
+    var createInstanceOrReuseExistingOne = function (registration, options) {
+        if (registration.singleton && registration.isInitialized) {
             return registration.instance;
         }
 
@@ -121,57 +121,58 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         var instanceProvider = registration.instanceProvider || swiftcore.defaultInstanceProvider;
 
         var instance = instanceProvider(registration, options);
-        if (registration.singleton){
+        if (registration.singleton) {
             registration.instance = instance;
         }
 
         return instance;
     };
 
-    var getDependencyInfo = function(dependency){
+    var getDependencyInfo = function(dependency) {
         var dependencyInfo;
-        if (dependency.indexOf(" as ") > -1){
+        if (typeof dependency === "string" && dependency.indexOf(" as ") > -1) {
             var splitted = dependency.split(" as ");
             dependencyInfo = {
                 name: splitted[0],
                 alias: splitted[1]
             };
-        }
-        else{
+        } else {
             dependencyInfo = {
                 name: dependency,
                 alias: null
-            }
+            };
         }
         return dependencyInfo;
-    }
+    };
 
-    var resolveOptions = function(dependencies){
+    var resolveOptions = function (dependencies) {
         var options = {};
 
-        for (var i in dependencies){
+        for (var i in dependencies) {
 
-            var dependencyInfo = getDependencyInfo(dependencies[i]);
-            var registration = swiftcore.getRegistration(dependencyInfo.name);
-            var formattedDependencyName = dependencyInfo.alias !== null ? dependencyInfo.alias : swiftcore.defaultDependencyFormatter(dependencyInfo.name);
+            if (dependencies.hasOwnProperty(i)) {
+                var dependencyInfo = getDependencyInfo(dependencies[i]);
+                var registration = swiftcore.getRegistration(dependencyInfo.name);
+                var formattedDependencyName = dependencyInfo.alias !== null ? dependencyInfo.alias : swiftcore.defaultDependencyFormatter(dependencyInfo.name);
 
-            if (!hasDependencies(registration)){
-                options[formattedDependencyName] = createInstanceOrReuseExistingOne(registration);
-            }
-            else{
-                var tempOptions = resolveOptions(registration.type.dependencies);
-                options[formattedDependencyName] = createInstanceOrReuseExistingOne(registration, tempOptions);
+                if (!hasDependencies(registration)) {
+                    options[formattedDependencyName] = createInstanceOrReuseExistingOne(registration);
+                }
+                else {
+                    var tempOptions = resolveOptions(registration.type.dependencies);
+                    options[formattedDependencyName] = createInstanceOrReuseExistingOne(registration, tempOptions);
+                }
             }
         }
         return options;
     };
 
-    var trimAndLowerCase = function(str){
+    var trimAndLowerCase = function (str) {
         return str.trim().toLowerCase();
     };
 
     //this code is stolen from here: http://noteslog.com/post/how-to-force-jqueryextend-deep-recursion/
-    var deepExtend = function() {
+    var deepExtend = function () {
         var target = arguments[0] || {}, i = 1, length = arguments.length, deep = false, options;
 
         if (target.constructor == Boolean) {
@@ -190,21 +191,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
         for (; i < length; i++)
             if ((options = arguments[i]) != null)
-                for ( var name in options ) {
+                for (var name in options) {
                     if (target === options[name])
                         continue;
 
                     if (deep && options[name] && typeof options[name] == "object" && target[name] && !options[name].nodeType)
                         target[name] = deepExtend(true, target[name], options[name]);
 
-                    else if (options[name] != undefined )
+                    else if (options[name] != undefined)
                         target[name] = options[name];
                 }
 
         return target;
     };
 
-    swiftcore.register = function(name, type, singleton){
+    swiftcore.register = function (name, type, singleton) {
         return swiftcore.addRegistration({
             type: type,
             singleton: !!singleton,
@@ -212,18 +213,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         });
     };
 
-    swiftcore.addRegistration = function(registration){
+    swiftcore.addRegistration = function (registration) {
         var newRegistration = new Registration();
         deepExtend(newRegistration, registration);
         store[trimAndLowerCase(newRegistration.name)] = newRegistration;
         return newRegistration;
     };
 
-    swiftcore.getRegistration = function(name) {
+    swiftcore.getRegistration = function (name) {
         return store[trimAndLowerCase(name)];
     };
 
-    swiftcore.resolve = function(name){
+    swiftcore.resolve = function (name) {
         var registration = swiftcore.getRegistration(name);
         if (registration === undefined) {
             throw "Failed to resolve: " + name + ". Registration unknown";
